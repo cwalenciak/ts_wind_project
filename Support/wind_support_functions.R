@@ -6,7 +6,7 @@ library(lubridate)
 # Creates a dataframe from the nc data
 #******************************************************************************
 # nrow:
-nc_to_df <- function(nc_data, nrow, file_date){
+nc_to_df <- function(nc_data, nrow, file_date = "1/1/1900"){
     
     # Extract Data from nc file
     time_offset <- ncvar_get(nc_data, "time_offset")
@@ -120,16 +120,18 @@ combine_files <- function(flist, fname, time_col, time_span, time_interval, nrow
         incr = incr + 1
         
         nc <- nc_open(paste0(fname, "/", i))
-        
-        file_date <- extract_file_date(nc)
-        
-        df <- nc_to_df(nc, nrow, file_date)
+
+        # file_date <- extract_file_date(nc)
+        # df <- nc_to_df(nc, nrow, "1/1/1900")
+        df <- nc_to_df(nc, nrow)
         
         if(time_interval > 0){
             new_df <- time_measurment_change(df, time_col, time_span, time_interval, keep_cols)
         } else {
             new_df <- df
         }
+        
+        new_df$file_date <- extract_file_date(nc)
         
         combined_df <- rbind(combined_df, new_df)
         
