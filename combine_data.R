@@ -22,9 +22,7 @@ keep_cols <- c( "horizontal_wspd"
 time_span = (24 * 60 * 60)
 
 # flist, fname, time_col, time_span, time_interval, keep_cols
-
-file_paths <- paste0(getwd(), "/Data/")
-df <- combine_files(flist, file_paths, "time_offset", time_span, 60, keep_cols)
+df <- combine_files(flist, "Data", "time_offset", time_span, 60, 4, keep_cols)
 
 
 hist(df$horizontal_wspd)
