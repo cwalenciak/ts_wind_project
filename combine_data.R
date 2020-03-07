@@ -5,18 +5,17 @@ library(ncdf4)
 setwd("C:/Users/cwale/OneDrive/Desktop/TS Project")
 
 # Call support function file
-source("C:/Users/cwale/OneDrive/Desktop/TS Project/Support/wind_support_functions.R")
+source("C:/Users/cwale/OneDrive/Desktop/TS Project/ts_wind_project/Support/wind_support_functions.R")
 
 # retrieve a list of nc files in my data folder
 flist <- list.files(path = "Data", pattern = "^.*\\.(nc|NC|Nc|Nc)$")
 
 
-keep_cols <- c( "horizontal_wspd"
-                , "horizontal_wdir"
-                , "air_pressure"
-                , "relative_humidity"
-                , "file_date"
-)
+keep_cols <- c( "horizontal_wspd", 
+                "horizontal_wdir", 
+                "air_pressure", 
+                "relative_humidity"
+                )
 
 
 time_span = (24 * 60 * 60)
