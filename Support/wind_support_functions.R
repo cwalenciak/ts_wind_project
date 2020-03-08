@@ -135,6 +135,7 @@ combine_files <- function(flist, fname, time_col, time_span, time_interval, nrow
         } else {
             new_df <- df
         }
+
         
         file_date <- extract_file_date(nc)
         new_df$file_date <- file_date
