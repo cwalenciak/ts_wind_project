@@ -130,7 +130,7 @@ combine_files <- function(flist, fname, time_col, time_span, time_interval, nrow
         } else {
             new_df <- df
         }
-        
+        new_df$date = file_date
         combined_df <- rbind(combined_df, new_df)
         
         nc_close(nc)
