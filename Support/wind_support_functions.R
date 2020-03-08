@@ -16,11 +16,11 @@ nc_to_df <- function(nc_data, nrow, file_date = "1/1/1900"){
     rel_humid <- ncvar_get(nc_data, "relative_humidity")
     
     df <- data.frame( time_offset
-                     , h_windspeed[nrow,]
-                     , h_wdir[nrow,]
-                     , air_pressure
-                     , rel_humid
-                     )
+                      , h_windspeed[nrow,]
+                      , h_wdir[nrow,]
+                      , air_pressure
+                      , rel_humid
+    )
     
     # Change column names
     names(df) <- c( "time_offset"
@@ -109,9 +109,16 @@ write_to_txt <- function(data, file_name){
 # Writes data to working directory in a text file
 #******************************************************************************
 
-combine_files <- function(flist, fname, time_col, time_span, time_interval, nrow, keep_cols){
+combine_files <- function(flist, fname, time_col, time_span, time_interval, nrow, keep_cols, return_list = F){
     
-    combined_df <- data.frame()
+    file_date <- ""
+    
+    
+    if(return_list == F){
+        combined_data <- data.frame()
+    } else {
+        combined_data  <- list()
+    }
     
     incr = 0
     
@@ -121,8 +128,6 @@ combine_files <- function(flist, fname, time_col, time_span, time_interval, nrow
         
         nc <- nc_open(paste0(fname, "/", i))
 
-        # file_date <- extract_file_date(nc)
-        # df <- nc_to_df(nc, nrow, "1/1/1900")
         df <- nc_to_df(nc, nrow)
         
         if(time_interval > 0){
@@ -131,17 +136,24 @@ combine_files <- function(flist, fname, time_col, time_span, time_interval, nrow
             new_df <- df
         }
         
-        new_df$file_date <- extract_file_date(nc)
+        file_date <- extract_file_date(nc)
+        new_df$file_date <- file_date
         
-        combined_df <- rbind(combined_df, new_df)
         
+        if(return_list == F){
+            
+            combined_data <- rbind(combined_data, new_df)
+        } else {
+            combined_data[[as.character(file_date)]] <- new_df
+        }
+
         nc_close(nc)
         
         print(paste0("File Index: ", i, "   complete: ", incr/length(flist) * 100, "%"))
         
     }
     
-    return(combined_df)
+    return(combined_data)
     
 }
 
