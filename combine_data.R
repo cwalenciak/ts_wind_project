@@ -5,17 +5,21 @@ library(ncdf4)
 #setwd("C:/Users/cwale/OneDrive/Desktop/TS Project")
 
 # Call support function file
+
 source("Support/wind_support_functions.R")
 source("Support/ggplot_corr_plot.R")
+
 # retrieve a list of nc files in my data folder
 flist <- list.files(path = "Data", pattern = "^.*\\.(nc|NC|Nc|Nc)$")
 
 
-keep_cols <- c( "horizontal_wspd"
-                , "horizontal_wdir"
-                , "air_pressure"
-                , "relative_humidity"
-)
+
+keep_cols <- c( "horizontal_wspd", 
+                "horizontal_wdir", 
+                "air_pressure", 
+                "relative_humidity"
+                )
+
 
 
 time_span = (24 * 60 * 60)
