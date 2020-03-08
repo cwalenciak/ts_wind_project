@@ -141,7 +141,6 @@ combine_files <- function(flist, fname, time_col, time_span, time_interval, nrow
         
         
         if(return_list == F){
-            
             combined_data <- rbind(combined_data, new_df)
         } else {
             combined_data[[as.character(file_date)]] <- new_df
