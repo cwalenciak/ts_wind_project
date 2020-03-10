@@ -148,3 +148,75 @@ combine_files <- function(flist, fname, time_col, time_span, time_interval, nrow
     return(list(combined_df, combined_list))
     
 }
+
+
+
+
+#******************************************************************************
+# Calculate ASE Score Cross Validation
+#******************************************************************************
+
+wind_ase_score <- function(flist, s, d, horizon, p_max = 5, q_max = 2){
+    
+    df <- data.frame()
+    
+    for(i in 1:length(flist)){
+        
+        x_name <- names(flist[i])
+        x <- flist[[i]]$horizontal_wspd
+        
+        est_data <- x
+       
+        if(d > 0){
+            for(i in 1:d){
+                est_data <- artrans.wge(est_data, phi.tr = 1)
+            }
+        }
+        
+        # Get p and q
+        aic_type <- c('aic', 'bic')
+        pq_list <- list()
+        
+        incr <- 1
+        
+        for(i in aic_type){
+            aic_x <- aic5.wge(est_data, p = 0:p_max, q = 0:q_max, type = as.character(i))
+            
+            for(j in 1:5){
+                pq_list[[incr]] <- c(aic_x[[1]][j], aic_x[[2]][j])
+                incr <- incr + 1
+            }
+        }
+        
+        pq_list <- unique(pq_list)
+
+        # Estimate   
+        for(i in 1:length(pq_list)){
+            
+            # Train
+            est_x <- est.arma.wge(est_data, p = pq_list[[i]][1], q = pq_list[[i]][2])
+            
+            # Test
+            ase_sum <- 0
+            
+            for(j in flist){
+                x_fore <- fore.aruma.wge(j[,2], phi = est_x$phi, theta = est_x$theta, d = d, limits = F, 
+                                         n.ahead = horizon, lastn = T, plot = F)
+                
+                length(x_fore$f)
+                length(j[,2][((length(j[,2]) - horizon) + 1):length(j[,2])])
+                err <- x_fore$f  - j[,2][((length(j[,2]) - horizon) + 1):length(j[,2])]
+                ase_sum <- ase_sum + mean(err^2)
+            }
+            
+            new_df <- data.frame(x_name, pq_list[[i]][1], pq_list[[i]][2], s, d, horizon, ase_sum)
+            names(new_df) <- c("train_data", "p", "q", "s", "d", "horizon", "ASE Sum")
+            
+            df <- rbind(df, new_df)
+        }
+    }
+    
+    names(df) <- c("train_data", "p", "q", "s", "d", "horizon", "ASE Sum")
+    
+    return(df)   
+}
