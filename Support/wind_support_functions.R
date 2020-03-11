@@ -209,14 +209,39 @@ wind_ase_score <- function(flist, s, d, horizon, p_max = 5, q_max = 2){
                 ase_sum <- ase_sum + mean(err^2)
             }
             
-            new_df <- data.frame(x_name, pq_list[[i]][1], pq_list[[i]][2], s, d, horizon, ase_sum)
-            names(new_df) <- c("train_data", "p", "q", "s", "d", "horizon", "ASE Sum")
+            ase_sum <- ase_sum/length(flist)
             
+            new_df <- data.frame(x_name, pq_list[[i]][1], pq_list[[i]][2], s, d, horizon, ase_sum)
+  
             df <- rbind(df, new_df)
         }
     }
     
-    names(df) <- c("train_data", "p", "q", "s", "d", "horizon", "ASE Sum")
+    names(df) <- c("train_data", "p", "q", "s", "d", "horizon", "Mean ASE")
     
     return(df)   
+}
+
+
+
+#******************************************************************************
+# Splits a Data frame into multiple training sets. Returns a list
+#******************************************************************************
+split_to_train <- function(x, train_size, spacer = 1){
+    
+    final_df <- data.frame()
+    new_list <- list()
+    
+    for(i in seq(1, (dim(x)[1] - train_size + 1), by = spacer)){
+        
+        end_pos <- (i + train_size - 1)
+        
+        if( end_pos > dim(x)[1]){
+            end_pos <- dim(x)[1]
+        }
+        
+        new_list[[ as.character(paste0(i,":",end_pos))]] <- x[(i:end_pos),]
+        print(i)
+    }
+    return(new_list)
 }
